@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ProductCard from "./ProductCard";
+import { API_URL } from "@/lib/constants";
+import { useProducts } from "@/hooks/useProducts";
 
 interface TutorListing {
   id: string;
@@ -21,37 +23,17 @@ interface TutorListing {
 }
 
 export default function NearestTutorsSection() {
-  const [tutors, setTutors] = useState<TutorListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useProducts();
 
-  useEffect(() => {
-    // Fetch nearest tutors (for now, fetching all listings from our API)
-    const fetchTutors = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/listings");
-        if (!response.ok) throw new Error("Failed to fetch");
-        const data = await response.json();
-        
-        // Add mock elite/featured flags for demonstration if not provided by backend
-        const enhancedData = data.map((tutor: any, index: number) => ({
-          ...tutor,
-          isElite: index % 2 === 0, // Alternate elite status
-          isFeatured: index % 3 === 0, // Alternate featured status
-          date: index === 0 ? "TODAY" : index === 1 ? "YESTERDAY" : `${index + 2} DAYS AGO`
-        }));
-        
-        setTutors(enhancedData);
-      } catch (error) {
-        console.error("Error fetching nearest tutors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const tutors = useMemo<TutorListing[]>(() => {
+    if (!data) return [];
+    return data.map((tutor: any, index: number) => ({
+      ...tutor,
+      date: index === 0 ? "TODAY" : index === 1 ? "YESTERDAY" : `${index + 2} DAYS AGO`
+    }));
+  }, [data]);
 
-    fetchTutors();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-6">
         <h2 className="text-xl font-normal text-gray-800 mb-4">Your Nearest Tutors</h2>
@@ -67,18 +49,23 @@ export default function NearestTutorsSection() {
   if (tutors.length === 0) return null;
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-[22px] font-normal text-[#002f34]">Your Nearest Tutors</h2>
-        <a href="#" className="text-sm font-bold text-gray-900 underline hover:no-underline">
-          View more
+    <div className="container mx-auto px-4 py-12">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h2 className="text-2xl font-extrabold text-[#002f34] tracking-tight">Your Nearest Tutors</h2>
+          <p className="text-gray-500 text-sm">Top-rated tutors in your neighborhood</p>
+        </div>
+        <a href="#" className="text-sm font-bold text-[#1463a5] bg-[#1463a5]/5 px-4 py-2 rounded-full hover:bg-[#1463a5] hover:text-white transition-all">
+          View all
         </a>
       </div>
-      
+
       {/* Horizontal scrolling container */}
-      <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 scroll-smooth" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        {tutors.map((tutor) => (
-          <ProductCard key={tutor.id} product={tutor} />
+      <div className="flex gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x">
+        {tutors.map((tutor: TutorListing) => (
+          <div key={tutor.id} className="w-[300px] shrink-0 snap-start">
+            <ProductCard product={tutor} />
+          </div>
         ))}
       </div>
     </div>

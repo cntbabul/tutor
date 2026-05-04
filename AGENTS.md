@@ -41,10 +41,11 @@ This project uses the **App Router exclusively** (`src/app/`). Do **not** create
 
 Current routes:
 - `src/app/page.tsx` — Home
-- `src/app/layout.tsx` — Root layout (wraps Clerk + React Query providers)
-- `src/app/teach/` — Teach flow
-- `src/app/listing/` — Listing pages
+- `src/app/layout.tsx` — Root layout (wraps Clerk + React Query providers + Header)
+- `src/app/teach/` — Teach flow (Ad posting)
+- `src/app/listing/` — Listing pages (Details with image carousel)
 - `src/app/account/` — Account / profile pages
+- `src/app/my-ads/` — User's active listings management
 
 ### 3. Server vs Client components
 - Files are **Server Components by default**.
@@ -75,21 +76,24 @@ src/
 ├── app/           ← Next.js App Router pages & layouts
 ├── components/    ← Shared UI components (Header, Footer, UserDropdown …)
 │   └── ui/        ← shadcn-generated primitives (Button, Avatar, Badge …)
-├── hooks/         ← Custom React hooks
+├── hooks/         ← Custom React hooks (using TanStack Query + API client)
 └── lib/           ← Utilities, db client, helpers
+    ├── api.ts     ← Centralized Axios API client (with Clerk JWT interceptor)
+    └── constants.ts ← Global constants (API_URL, Categories, etc.)
 ```
 
 - Always create new components in `src/components/` as separate `.tsx` files.
 - shadcn primitives live in `src/components/ui/` — never edit them manually; re-run `shadcn add <component>` to update.
 
-### 8. Instant navigation gotcha
+### 8. API Client & Data fetching
+- **Centralized Client**: Always use the API client from `src/lib/api.ts` for network requests.
+- **Client Components**: Use the `useApiClient` hook to get an authenticated Axios instance. Use resource objects like `listingApi` or `userApi` to perform actions.
+- **TanStack Query**: Always wrap API calls in `useQuery` or `useMutation` for Client Components.
+- **No Hardcoded URLs**: Never use `http://localhost:5000` directly. Always use the `API_URL` constant from `src/lib/constants.ts`.
+
+### 9. Instant navigation gotcha
 If fixing **slow client-side navigations**, `<Suspense>` alone is **not** enough.  
 Read `node_modules/next/dist/docs/01-app/02-guides/instant-navigation.md` — you must also export `unstable_instant` from the route.
-
-### 9. Data fetching
-- Prefer **Server Components** + direct async data fetching.
-- Use **TanStack Query** (`useQuery` / `useMutation`) only in Client Components that need reactivity or optimistic updates.
-- Read `node_modules/next/dist/docs/01-app/01-getting-started/06-fetching-data.md` and `07-mutating-data.md` before adding any fetch/mutation logic.
 
 ### 10. Dev server
 ```bash
@@ -97,3 +101,4 @@ npm run dev      # starts Next.js dev server
 npm run build    # production build (only run to verify correctness)
 npm run lint     # ESLint (Next.js 16 ships ESLint 9 flat config)
 ```
+

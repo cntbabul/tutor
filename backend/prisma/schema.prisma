@@ -7,14 +7,35 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String?
-  email     String   @unique
+  email     String    @unique
   image     String?
-  role      Role     @default(STUDENT) // STUDENT or TUTOR
+  role      Role      @default(STUDENT) // STUDENT or TUTOR
   tutor     Tutor?
+  chats     Chat[]    @relation("UserChats")
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Chat {
+  id            String    @id @default(cuid())
+  participants  User[]    @relation("UserChats")
+  messages      Message[]
+  lastMessageAt DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  text      String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -23,18 +44,18 @@ enum Role {
 }
 
 model Tutor {
-  id             String    @id @default(cuid())
-  userId         String    @unique
-  user           User      @relation(fields: [userId], references: [id])
-  bio            String
-  qualification  String
-  experience     Int       // Years of experience
-  hourlyRate     Float
-  rating         Float     @default(0)
-  isVerified     Boolean   @default(false)
-  listings       Listing[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  bio           String
+  qualification String
+  experience    Int // Years of experience
+  hourlyRate    Float
+  rating        Float     @default(0)
+  isVerified    Boolean   @default(false)
+  listings      Listing[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Category {
@@ -47,7 +68,7 @@ model Category {
 
 model SubCategory {
   id         String    @id @default(cuid())
-  name       String    // Class 1, Class 2, etc.
+  name       String // Class 1, Class 2, etc.
   slug       String
   categoryId String
   category   Category  @relation(fields: [categoryId], references: [id])
@@ -55,21 +76,22 @@ model SubCategory {
 }
 
 model Listing {
-  id            String      @id @default(cuid())
-  title         String      // e.g., "Science for Class 2, 3, 4"
-  description   String
-  subjects      String[]    // ["Science", "Maths"]
-  
-  tutorId       String
-  tutor         Tutor       @relation(fields: [tutorId], references: [id])
-  
-  categoryId    String
-  category      Category    @relation(fields: [categoryId], references: [id])
-  
+  id          String   @id @default(cuid())
+  title       String // e.g., "Science for Class 2, 3, 4"
+  description String
+  subjects    String[] // ["Science", "Maths"]
+  images      String[] // ["https://ik.imagekit.io/..."]
+
+  tutorId String
+  tutor   Tutor  @relation(fields: [tutorId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
   subCategoryId String
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
-  
-  price         Float       // Price for this specific service
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+
+  price     Float // Price for this specific service
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

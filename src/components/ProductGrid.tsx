@@ -31,20 +31,25 @@ export default function ProductGrid() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-2xl font-normal text-primary mb-6">
-        Available Tutors Near You
-      </h2>
-      
+    <div className="container mx-auto px-4 py-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <div>
+          <h2 className="text-3xl font-extrabold text-[#002f34] tracking-tight">
+            Available Tutors Near You
+          </h2>
+          <p className="text-gray-500 mt-1">Verified educators ready to help you grow</p>
+        </div>
+      </div>
+
       {products?.length === 0 ? (
-        <div className="text-center py-20">
+        <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
           <p className="text-xl text-muted-foreground">No tutors found matching your search.</p>
           <Button variant="link" onClick={() => window.location.href = "/"} className="mt-4 text-primary font-bold">
             Clear all filters
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {products?.map((product: any) => (
             <ProductCard key={product.id} product={product} />
           ))}

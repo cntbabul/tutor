@@ -14,6 +14,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@clerk/express": "^2.1.12",
     "@imagekit/nodejs": "^7.5.0",
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/adapter-neon": "^7.8.0",
@@ -22,8 +23,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "imagekit": "^6.0.0",
     "pg": "^8.20.0",
+    "socket.io": "^4.8.3",
     "ws": "^8.20.0",
     "zod": "^4.4.2"
   },

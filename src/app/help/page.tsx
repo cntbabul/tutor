@@ -1,13 +1,12 @@
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNav from "@/components/BottomNav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
 } from "@/components/ui/accordion";
 import { Search, BookOpen, ShieldCheck, CreditCard, MessageCircle, FileText } from "lucide-react";
 
@@ -22,17 +21,16 @@ export default function HelpPage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
-      
+
       {/* Help Center Hero */}
       <div className="bg-[#002f34] py-16">
         <div className="container mx-auto px-4 max-w-3xl text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-6">Hi, how can we help you?</h1>
           <div className="relative max-w-2xl mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-6 h-6" />
-            <Input 
-              type="text" 
-              placeholder="Search for articles, topics, or FAQs..." 
+            <Input
+              type="text"
+              placeholder="Search for articles, topics, or FAQs..."
               className="w-full pl-14 pr-4 py-6 text-lg rounded-xl shadow-lg border-0 focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-white"
             />
           </div>
@@ -40,7 +38,7 @@ export default function HelpPage() {
       </div>
 
       <div className="flex-grow container mx-auto px-4 py-12 max-w-5xl">
-        
+
         {/* Categories Grid */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold text-[#002f34] mb-6">Browse by Topic</h2>
@@ -60,7 +58,7 @@ export default function HelpPage() {
         {/* Popular FAQs */}
         <div className="mb-16 bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100">
           <h2 className="text-2xl font-bold text-[#002f34] mb-6">Popular FAQs</h2>
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion className="w-full">
             <AccordionItem value="item-1">
               <AccordionTrigger className="text-base font-medium">How do I post a tutoring advertisement?</AccordionTrigger>
               <AccordionContent className="text-gray-600">

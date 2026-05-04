@@ -1,17 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
+import { useApiClient, listingApi } from "@/lib/api";
 
 export const useProducts = (q?: string) => {
+  const api = useApiClient();
+  
   return useQuery({
     queryKey: ["listings", q],
     queryFn: async () => {
-      const url = q 
-        ? `http://localhost:5000/api/listings?q=${encodeURIComponent(q)}`
-        : "http://localhost:5000/api/listings";
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
+      const response = await listingApi.getListings(api, q);
+      return response.data;
     },
   });
 };

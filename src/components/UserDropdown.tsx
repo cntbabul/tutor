@@ -16,6 +16,7 @@ import {
   LogOut,
   User,
 } from "lucide-react";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useClerk, useUser, useAuth } from "@clerk/nextjs";
 
@@ -83,11 +84,7 @@ export default function UserDropdown() {
       label: "Buy Business Packages",
       href: "/packages",
     },
-    {
-      icon: <ShoppingCart size={18} />,
-      label: "View Cart",
-      href: "/cart",
-    },
+
     {
       icon: <CreditCard size={18} />,
       label: "Bought Packages & Billing",
@@ -192,13 +189,13 @@ export default function UserDropdown() {
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm text-gray-900 truncate">{displayName}</p>
-              <a
+              <Link
                 href="/profile"
                 className="inline-block mt-1 text-xs font-medium text-white bg-primary hover:bg-primary/90 transition-colors px-3 py-1 rounded-full"
                 onClick={() => setOpen(false)}
               >
                 View and edit profile
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -221,9 +218,9 @@ export default function UserDropdown() {
                     <span className="flex-1 text-left font-medium">{item.label}</span>
                   </button>
                 ) : (
-                  <a
+                  <Link
                     role="menuitem"
-                    href={item.href}
+                    href={item.href || "#"}
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors group"
                   >
@@ -237,7 +234,7 @@ export default function UserDropdown() {
                       </span>
                     )}
 
-                  </a>
+                  </Link>
                 )}
 
                 {/* Divider */}

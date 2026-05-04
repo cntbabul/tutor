@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tutor Marketplace (OLX Clone)
 
-## Getting Started
+A high-fidelity marketplace for educational services, built with **Next.js 15 (App Router)**, **React 19**, and **Tailwind CSS v4**.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Ad Posting Flow**: Intuitive "Teach" flow to post tutor listings with multi-photo support.
+- **Image Management**: Seamless integration with **ImageKit** for optimized image hosting and delivery.
+- **User Dashboard**: Dedicated "My Ads" section to manage, edit, and delete your listings.
+- **Multi-Image Carousel**: High-performance image sliders for both marketplace cards and detail pages.
+- **Modern Search**: Responsive search and category filtering for finding the right tutors.
+- **Auth**: Secure user authentication powered by **Clerk (v7)**.
+- **Backend**: Robust API built with **Prisma 7** and **Neon PostgreSQL**.
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 15, React 19, Tailwind CSS v4, shadcn/ui.
+- **State & Data**: TanStack Query (React Query v5), Axios.
+- **Auth**: Clerk.
+- **Database**: Prisma 7, Neon (PostgreSQL).
+- **Storage**: ImageKit.io.
+
+## 📦 Project Structure
+
+- `src/app/`: Next.js App Router (Pages & Layouts).
+- `src/components/`: Reusable UI components.
+- `src/lib/api.ts`: Centralized, authenticated API client (Axios).
+- `src/hooks/`: Custom hooks using TanStack Query for reactive data fetching.
+- `backend/`: Express server handling business logic and database interactions.
+
+## 🚦 Getting Started
+
+### 1. Prerequisites
+- Node.js (Latest LTS)
+- Clerk Account
+- ImageKit.io Account
+- Neon Database instance
+
+### 2. Environment Variables
+Create a `.env.local` in the root directory:
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=...
+CLERK_SECRET_KEY=...
+NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=...
+NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=...
+IMAGEKIT_PRIVATE_KEY=...
+NEXT_PUBLIC_API_URL=http://localhost:5000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Installation
+```bash
+npm install
+cd backend && npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Running Development
+```bash
+# Terminal 1 (Frontend)
+npm run dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Terminal 2 (Backend)
+cd backend && npm run dev
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📜 Rules for AI Agents
+Detailed project rules and architectural guidelines can be found in [AGENTS.md](./AGENTS.md).

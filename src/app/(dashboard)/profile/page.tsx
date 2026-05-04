@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNav from "@/components/BottomNav";
 import { useUser } from "@clerk/nextjs";
@@ -9,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ProductCard from "@/components/ProductCard";
+import { API_URL } from "@/lib/constants";
 import { Share2, CalendarDays, Edit3, User as UserIcon, Users, Info, Mail, Phone, ExternalLink } from "lucide-react";
 
 export default function CustomProfilePage() {
@@ -31,7 +31,7 @@ export default function CustomProfilePage() {
 
     const fetchProfile = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/users/profile", {
+        const res = await fetch(`${API_URL}/api/users/profile`, {
           headers: {
             "x-user-id": user.id,
           },
@@ -71,7 +71,7 @@ export default function CustomProfilePage() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/users/profile", {
+      const res = await fetch(`${API_URL}/api/users/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,7 +103,7 @@ export default function CustomProfilePage() {
   if (!isLoaded || fetching) {
     return (
       <main className="min-h-screen flex flex-col bg-gray-50">
-        <Header />
+
         <div className="flex-grow flex items-center justify-center">Loading...</div>
       </main>
     );
@@ -112,7 +112,7 @@ export default function CustomProfilePage() {
   if (!user) {
     return (
       <main className="min-h-screen flex flex-col bg-gray-50">
-        <Header />
+
         <div className="flex-grow flex items-center justify-center">Please sign in to view your profile.</div>
       </main>
     );
@@ -120,7 +120,7 @@ export default function CustomProfilePage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+
       
       <div className="flex-grow container mx-auto px-4 py-8">
         
@@ -229,7 +229,7 @@ export default function CustomProfilePage() {
                       location: "India",
                       category: listing.category?.name || "Education",
                       subCategory: listing.subCategory?.name || "Classes",
-                      images: ["https://images.unsplash.com/photo-1543269664-56d93c1b41a6?w=800&q=80"],
+                      images: listing.images || [],
                       isFeatured: false,
                       isElite: false,
                       date: "RECENT",

@@ -1,14 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
+import { useApiClient, listingApi } from "@/lib/api";
 
 export const useListing = (id: string) => {
+  const api = useApiClient();
+
   return useQuery({
     queryKey: ["listing", id],
     queryFn: async () => {
-      const response = await fetch(`http://localhost:5000/api/listings/${id}`);
-      if (!response.ok) {
-        throw new Error("Listing not found");
-      }
-      return response.json();
+      const response = await listingApi.getListing(api, id);
+      return response.data;
     },
     enabled: !!id,
   });

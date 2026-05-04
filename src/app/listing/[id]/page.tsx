@@ -1,7 +1,7 @@
 "use client";
+import { useState } from "react";
 
 import { useParams } from "next/navigation";
-import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import { useListing } from "@/hooks/useListing";
 import { 
@@ -15,26 +15,59 @@ import {
   CheckCircle2, 
   MessageCircle, 
   Phone,
-  ArrowLeft
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Edit2
 } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { chatApi, useApiClient } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ListingPage() {
   const params = useParams();
   const id = params.id as string;
+  const { user } = useUser();
   const { data: listing, isLoading, error } = useListing(id);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const isOwner = user?.id === listing?.tutor?.userId;
+  const router = useRouter();
+  const api = useApiClient();
+  const queryClient = useQueryClient();
+
+  const contactMutation = useMutation({
+    mutationFn: () => chatApi.getOrCreateChat(api, user?.id || "", listing?.tutor?.userId || ""),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["chats", user?.id] });
+      router.push(`/chat/${res.data.id}`);
+    },
+    onError: (error: any) => {
+      console.error("Failed to start chat:", error);
+      alert("Could not connect to tutor. Please try again later.");
+    }
+  });
+
+  const handleContactTutor = () => {
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
+    contactMutation.mutate();
+  };
 
   if (isLoading) return <div className="p-8 text-center">Loading Listing...</div>;
   if (error || !listing) return <div className="p-8 text-center text-destructive">Listing not found.</div>;
 
   return (
     <main className="min-h-screen bg-[#f2f4f5] pb-20 lg:pb-12">
-      <Header />
+
       
       {/* Mobile Back Button */}
       <div className="lg:hidden bg-white px-4 py-2 flex items-center gap-4 border-b">
@@ -51,14 +84,61 @@ export default function ListingPage() {
           <div className="lg:col-span-2 space-y-4">
             
             {/* Image Gallery */}
-            <div className="bg-black lg:rounded-lg overflow-hidden relative aspect-video md:aspect-[21/9]">
+            <div className="bg-black lg:rounded-lg overflow-hidden relative aspect-video md:aspect-[21/9] group">
               <Image
-                src={listing.images[0]}
+                src={listing.images[currentImageIndex] || "/placeholder.svg"}
                 alt={listing.title}
                 fill
-                className="object-contain"
+                unoptimized
+                className="object-contain transition-all duration-300"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
               />
+              
+              {/* Carousel Controls */}
+              {listing.images.length > 1 && (
+                <>
+                  <button 
+                    onClick={() => setCurrentImageIndex((prev) => (prev - 1 + listing.images.length) % listing.images.length)}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ChevronLeft size={24} className="text-primary" />
+                  </button>
+                  <button 
+                    onClick={() => setCurrentImageIndex((prev) => (prev + 1) % listing.images.length)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/80 hover:bg-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <ChevronRight size={24} className="text-primary" />
+                  </button>
+                  
+                  {/* Image Counter Badge */}
+                  <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-bold z-30">
+                    {currentImageIndex + 1} / {listing.images.length}
+                  </div>
+                  
+                  {/* Dots Indicators */}
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-1.5">
+                    {listing.images.map((_, i) => (
+                      <button 
+                        key={i} 
+                        onClick={() => setCurrentImageIndex(i)}
+                        className={`w-2 h-2 rounded-full transition-all ${
+                          i === currentImageIndex ? "bg-white w-4" : "bg-white/40"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
               <div className="absolute top-4 right-4 flex gap-2">
+                {isOwner && (
+                  <Button asChild size="icon" variant="secondary" className="rounded-full shadow-lg bg-white hover:bg-gray-100 text-[#002f34]">
+                    <Link href={`/teach?id=${listing.id}`}>
+                      <Edit2 size={20} />
+                    </Link>
+                  </Button>
+                )}
                 <Button size="icon" variant="secondary" className="rounded-full shadow-lg">
                   <Share2 size={20} />
                 </Button>
@@ -137,8 +217,12 @@ export default function ListingPage() {
                   <span className="text-3xl font-bold text-primary">₹ {listing.price}</span>
                   <span className="text-muted-foreground">/ per hour</span>
                 </div>
-                <Button className="w-full h-12 bg-primary text-white font-bold text-lg hover:bg-primary/90">
-                  Contact Tutor
+                <Button 
+                  onClick={handleContactTutor}
+                  disabled={isOwner || contactMutation.isPending}
+                  className="w-full h-12 bg-primary text-white font-bold text-lg hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {contactMutation.isPending ? "Connecting..." : isOwner ? "Your Listing" : "Contact Tutor"}
                 </Button>
                 <div className="flex items-center justify-between text-xs text-muted-foreground border-t pt-4">
                   <span>Service ID: {listing.id}</span>

@@ -8,11 +8,13 @@ import SearchBar from "./SearchBar";
 import UserDropdown from "./UserDropdown";
 import NotificationDropdown from "./NotificationDropdown";
 import LocationSelector from "./LocationSelector";
-import { Show, UserButton, useAuth, useUser, SignInButton } from "@clerk/nextjs";
+import { UserButton, useAuth, useUser, SignInButton } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-muted/30 backdrop-blur-sm lg:bg-muted">
@@ -42,7 +44,10 @@ export default function Header() {
         <div className="hidden lg:flex items-center gap-5">
 
 
-          <button className="flex flex-col items-center gap-0.5 text-primary hover:text-secondary transition-colors group">
+          <button 
+            onClick={() => router.push("/chat")}
+            className="flex flex-col items-center gap-0.5 text-primary hover:text-secondary transition-colors group"
+          >
             <div className="p-1 group-hover:bg-muted rounded-full transition-colors relative">
               <MessageCircle size={24} strokeWidth={2.5} />
               <span className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full border-2 border-white"></span>
@@ -71,11 +76,9 @@ export default function Header() {
             <NotificationDropdown />
           </div>
 
-          <Show when={isSignedIn}>
+          {isSignedIn ? (
             <UserButton />
-          </Show>
-
-          <Show when={!isSignedIn}>
+          ) : (
             <SignInButton mode="modal">
               <Avatar className="h-9 w-9 border-2 border-primary/10 cursor-pointer hover:border-primary/30 transition-all">
                 <AvatarImage src="" />
@@ -84,7 +87,7 @@ export default function Header() {
                 </AvatarFallback>
               </Avatar>
             </SignInButton>
-          </Show>
+          )}
         </div>
       </div>
     </header>

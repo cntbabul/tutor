@@ -13,3 +13,13 @@ export const CATEGORIES = [
   { value: "music", label: "Music & Dance" },
   { value: "sports", label: "Sports & Fitness" },
 ];
+
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
+export const PRICING_TYPES = [
+  { value: "hourly", label: "Hourly" },
+  { value: "weekly", label: "Weekly" },
+  { value: "monthly", label: "Monthly" },
+  { value: "fixed", label: "Fixed / Course" },
+];
+

@@ -3,8 +3,7 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { neon } from "@neondatabase/serverless";
 import dotenv from "dotenv";
 
-import path from "path";
-import { fileURLToPath } from "url";
+dotenv.config();
 
 dotenv.config();
 
@@ -135,8 +134,8 @@ async function main() {
 
     for (const l of t.listings) {
       const category = await prisma.category.findUnique({ where: { name: l.categoryName } });
-      const subCategory = await prisma.subCategory.findFirst({ 
-        where: { name: l.subCategoryName, categoryId: category?.id } 
+      const subCategory = await prisma.subCategory.findFirst({
+        where: { name: l.subCategoryName, categoryId: category?.id }
       });
 
       if (category && subCategory) {

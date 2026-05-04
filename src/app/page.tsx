@@ -1,4 +1,3 @@
-import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 import CategoryBar from "@/components/CategoryBar";
 import BannerCarousel from "@/components/BannerCarousel";
@@ -9,9 +8,6 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <Header />
-
       {/* Categories */}
       <CategoryBar />
 
