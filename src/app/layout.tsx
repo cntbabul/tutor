@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 import { ClerkProvider } from "@clerk/nextjs";
+import Header from "@/components/Header";
 
 export default function RootLayout({
   children,
@@ -31,7 +32,10 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
         >
-          <Providers>{children}</Providers>
+          <Providers>
+            <Header />
+            {children}
+          </Providers>
         </body>
       </html>
     </ClerkProvider>

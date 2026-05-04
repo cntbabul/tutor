@@ -3,12 +3,10 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { neon } from "@neondatabase/serverless";
 import dotenv from "dotenv";
 
-dotenv.config();
+import path from "path";
+import { fileURLToPath } from "url";
 
-console.log("DATABASE_URL:", process.env.DATABASE_URL ? "Defined" : "Undefined");
-if (process.env.DATABASE_URL) {
-  console.log("DATABASE_URL length:", process.env.DATABASE_URL.length);
-}
+dotenv.config();
 
 const connectionString = process.env.DATABASE_URL!;
 const sql = neon(connectionString);
