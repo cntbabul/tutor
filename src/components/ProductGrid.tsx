@@ -9,7 +9,7 @@ export default function ProductGrid() {
   const searchParams = useSearchParams();
   const q = searchParams.get("q") || undefined;
   const categorySlug = searchParams.get("category") || undefined;
-  
+
   const { data: products, isLoading, error } = useProducts({ q, categorySlug });
 
   if (isLoading) {
@@ -17,7 +17,10 @@ export default function ProductGrid() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-md" />
+            <div
+              key={i}
+              className="aspect-[4/5] bg-muted animate-pulse rounded-md"
+            />
           ))}
         </div>
       </div>
@@ -39,14 +42,28 @@ export default function ProductGrid() {
           <h2 className="text-3xl font-extrabold text-[#002f34] tracking-tight">
             Available Tutors Near You
           </h2>
-          <p className="text-gray-500 mt-1">Verified educators ready to help you grow</p>
+          <p className="text-gray-500 mt-1">
+            Verified educators ready to help you grow
+          </p>
+        </div>
+        <div>
+          Sort: <span>Nearest</span>
+        </div>
+        <div>
+          Filter by: <span>Nearest</span>
         </div>
       </div>
 
-      {(!products || !Array.isArray(products) || products.length === 0) ? (
+      {!products || !Array.isArray(products) || products.length === 0 ? (
         <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-          <p className="text-xl text-muted-foreground">No tutors found matching your search.</p>
-          <Button variant="link" onClick={() => window.location.href = "/"} className="mt-4 text-primary font-bold">
+          <p className="text-xl text-muted-foreground">
+            No tutors found matching your search.
+          </p>
+          <Button
+            variant="link"
+            onClick={() => (window.location.href = "/")}
+            className="mt-4 text-primary font-bold"
+          >
             Clear all filters
           </Button>
         </div>

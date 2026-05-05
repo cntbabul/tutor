@@ -17,8 +17,6 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4 lg:py-6">
           <BannerCarousel />
         </div>
-        {/* Nearest Tutors Section */}
-        <NearestTutorsSection />
 
         {/* Product Grid */}
         <ProductGrid />

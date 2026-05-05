@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.parallelism = 2;
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
