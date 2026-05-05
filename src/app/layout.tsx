@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "tutor - connect with nearest tutor.",
+  title: "Tutor",
   description: "Find the Tutor near you ",
 };
 
