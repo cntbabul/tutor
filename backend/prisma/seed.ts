@@ -5,17 +5,23 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
+
 dotenv.config();
 
+neonConfig.webSocketConstructor = ws;
+
 const connectionString = process.env.DATABASE_URL!;
-const sql = neon(connectionString);
-const adapter = new PrismaNeon(sql);
+const adapter = new PrismaNeon({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding database...");
 
   // 1. Clear existing data
+  await prisma.message.deleteMany();
+  await prisma.chat.deleteMany();
   await prisma.listing.deleteMany();
   await prisma.subCategory.deleteMany();
   await prisma.category.deleteMany();
@@ -148,6 +154,12 @@ async function main() {
             tutorId: tutor.id,
             categoryId: category.id,
             subCategoryId: subCategory.id,
+            targetClasses: [l.subCategoryName], // default to the primary subcategory class
+            mode: "OFFLINE",
+            latitude: 12.9716 + (Math.random() - 0.5) * 0.1, // Mock Bangalore coords
+            longitude: 77.5946 + (Math.random() - 0.5) * 0.1,
+            locationName: "Indiranagar, Bangalore",
+            city: "Bangalore",
           }
         });
       }

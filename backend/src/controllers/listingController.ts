@@ -3,18 +3,30 @@ import prisma from "@/config/db.js";
 import type { ListingWithRelations, FormattedListing } from "@/types/types.js";
 
 export const getListings = async (req: Request, res: Response) => {
-  const { q } = req.query;
+  const { q, categoryId, subCategoryId, categorySlug, subCategorySlug, targetClass, city, mode } = req.query;
 
   try {
+    const where: any = {};
+
+    if (q) {
+      where.OR = [
+        { title: { contains: q as string, mode: 'insensitive' } },
+        { description: { contains: q as string, mode: 'insensitive' } },
+        { category: { name: { contains: q as string, mode: 'insensitive' } } },
+        { subCategory: { name: { contains: q as string, mode: 'insensitive' } } },
+      ];
+    }
+
+    if (categoryId) where.categoryId = categoryId as string;
+    if (categorySlug) where.category = { slug: categorySlug as string };
+    if (subCategoryId) where.subCategoryId = subCategoryId as string;
+    if (subCategorySlug) where.subCategory = { slug: subCategorySlug as string };
+    if (targetClass) where.targetClasses = { has: targetClass as string };
+    if (city) where.city = { contains: city as string, mode: 'insensitive' };
+    if (mode) where.mode = mode as string;
+
     const listings = await prisma.listing.findMany({
-      where: q ? {
-        OR: [
-          { title: { contains: q as string, mode: 'insensitive' } },
-          { description: { contains: q as string, mode: 'insensitive' } },
-          { category: { name: { contains: q as string, mode: 'insensitive' } } },
-          { subCategory: { name: { contains: q as string, mode: 'insensitive' } } },
-        ]
-      } : {},
+      where,
       include: {
         tutor: {
           include: {
@@ -32,7 +44,7 @@ export const getListings = async (req: Request, res: Response) => {
       title: l.title,
       description: l.description,
       price: l.price,
-      location: "India",
+      location: l.locationName ?? "India",
       tutor: {
         name: l.tutor?.user?.name ?? "Anonymous Tutor",
         qualification: l.tutor?.qualification ?? "Not specified",
@@ -43,7 +55,14 @@ export const getListings = async (req: Request, res: Response) => {
       category: l.category?.name ?? "General",
       subCategory: l.subCategory?.name ?? "Other",
       images: (l.images && l.images.length > 0) ? l.images : ["https://images.unsplash.com/photo-1543269664-56d93c1b41a6?w=800&q=80"],
-      isFeatured: false
+      isFeatured: false,
+      mode: l.mode,
+      targetClasses: l.targetClasses,
+      latitude: l.latitude,
+      longitude: l.longitude,
+      locationName: l.locationName,
+      city: l.city,
+      subjects: l.subjects
     }));
 
     res.json(formattedListings);
@@ -80,7 +99,7 @@ export const getListingById = async (req: Request, res: Response) => {
       title: l.title,
       description: l.description,
       price: l.price,
-      location: "India",
+      location: l.locationName ?? "India",
       tutor: {
         name: l.tutor?.user?.name ?? "Anonymous Tutor",
         qualification: l.tutor?.qualification ?? "Not specified",
@@ -94,7 +113,13 @@ export const getListingById = async (req: Request, res: Response) => {
       subCategory: l.subCategory?.name ?? "Other",
       subjects: l.subjects,
       images: (l.images && l.images.length > 0) ? l.images : ["https://images.unsplash.com/photo-1543269664-56d93c1b41a6?w=800&q=80"],
-      isFeatured: false
+      isFeatured: false,
+      mode: l.mode,
+      targetClasses: l.targetClasses,
+      latitude: l.latitude,
+      longitude: l.longitude,
+      locationName: l.locationName,
+      city: l.city
     };
 
     res.json(formattedListing);
@@ -110,8 +135,17 @@ export const createListing = async (req: Request, res: Response) => {
     title,
     description,
     price,
-    category,
+    categoryId,
+    subCategoryId,
+    targetClasses,
+    mode,
+    latitude,
+    longitude,
+    locationName,
+    city,
     images,
+    subjects,
+    category, // Legacy fallback
   } = req.body;
 
   if (!userId) {
@@ -144,26 +178,35 @@ export const createListing = async (req: Request, res: Response) => {
       });
     }
 
-    const parentCategoryName = "Education & Classes";
-    const parentCategorySlug = "education-classes";
+    let finalCategoryId = categoryId;
+    let finalSubCategoryId = subCategoryId;
 
-    const categoryRecord = await prisma.category.upsert({
-      where: { slug: parentCategorySlug },
-      update: {},
-      create: { name: parentCategoryName, slug: parentCategorySlug }
-    });
+    // Legacy fallback if IDs are missing but category string is present
+    if (!finalCategoryId && category) {
+      const parentCategoryName = "Education & Classes";
+      const parentCategorySlug = "education-classes";
 
-    const subCategorySlug = category.toLowerCase().replace(/\s+/g, '-');
-    const subCategoryRecord = await prisma.subCategory.upsert({
-      where: { id: `sc-${subCategorySlug}` },
-      update: {},
-      create: {
-        id: `sc-${subCategorySlug}`,
-        name: category.charAt(0).toUpperCase() + category.slice(1),
-        slug: subCategorySlug,
-        categoryId: categoryRecord.id
-      }
-    });
+      const categoryRecord = await prisma.category.upsert({
+        where: { slug: parentCategorySlug },
+        update: {},
+        create: { name: parentCategoryName, slug: parentCategorySlug }
+      });
+
+      const subCategorySlug = category.toLowerCase().replace(/\s+/g, '-');
+      const subCategoryRecord = await prisma.subCategory.upsert({
+        where: { id: `sc-${subCategorySlug}` },
+        update: {},
+        create: {
+          id: `sc-${subCategorySlug}`,
+          name: category.charAt(0).toUpperCase() + category.slice(1),
+          slug: subCategorySlug,
+          categoryId: categoryRecord.id
+        }
+      });
+
+      finalCategoryId = categoryRecord.id;
+      finalSubCategoryId = subCategoryRecord.id;
+    }
 
     const safePrice = parseFloat(price) || 0;
     const listing = await prisma.listing.create({
@@ -172,9 +215,15 @@ export const createListing = async (req: Request, res: Response) => {
         description,
         price: safePrice,
         tutorId: tutor.id,
-        categoryId: categoryRecord.id,
-        subCategoryId: subCategoryRecord.id,
-        subjects: [category],
+        categoryId: finalCategoryId,
+        subCategoryId: finalSubCategoryId,
+        targetClasses: Array.isArray(targetClasses) ? targetClasses : [],
+        mode: mode || "OFFLINE",
+        latitude: latitude ? parseFloat(latitude) : null,
+        longitude: longitude ? parseFloat(longitude) : null,
+        locationName,
+        city,
+        subjects: Array.isArray(subjects) ? subjects : (category ? [category] : []),
         images: Array.isArray(images) ? images : [],
       }
     });
@@ -189,7 +238,19 @@ export const createListing = async (req: Request, res: Response) => {
 export const updateListing = async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const userId = req.headers["x-user-id"] as string;
-  const { title, description, price, images } = req.body;
+  const { 
+    title, 
+    description, 
+    price, 
+    images, 
+    mode, 
+    targetClasses, 
+    latitude, 
+    longitude, 
+    locationName, 
+    city,
+    subjects 
+  } = req.body;
 
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
@@ -202,7 +263,7 @@ export const updateListing = async (req: Request, res: Response) => {
     if (!listing) return res.status(404).json({ error: "Listing not found" });
     if (listing.tutor.userId !== userId) return res.status(403).json({ error: "Forbidden" });
 
-    const safePrice = parseFloat(price) || 0;
+    const safePrice = parseFloat(price) || listing.price;
     
     const updatedListing = await prisma.listing.update({
       where: { id },
@@ -211,6 +272,13 @@ export const updateListing = async (req: Request, res: Response) => {
         description,
         price: safePrice,
         images: Array.isArray(images) ? images : listing.images,
+        mode: mode || listing.mode,
+        targetClasses: Array.isArray(targetClasses) ? targetClasses : listing.targetClasses,
+        latitude: latitude ? parseFloat(latitude) : listing.latitude,
+        longitude: longitude ? parseFloat(longitude) : listing.longitude,
+        locationName: locationName || listing.locationName,
+        city: city || listing.city,
+        subjects: Array.isArray(subjects) ? subjects : listing.subjects,
       }
     });
 

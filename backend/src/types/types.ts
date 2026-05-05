@@ -65,6 +65,12 @@ export interface FormattedListing {
   images: string[];
   isFeatured: boolean;
   subjects?: string[];
+  mode: string;
+  targetClasses: string[];
+  latitude?: number | null;
+  longitude?: number | null;
+  locationName?: string | null;
+  city?: string | null;
 }
 
 export interface ImageKitOptions {

@@ -92,6 +92,17 @@ model Listing {
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
 
   price     Float // Price for this specific service
+
+  // Granular Filtering
+  targetClasses String[] // e.g., ["Class 1", "Class 2"]
+  mode          String   @default("OFFLINE") // ONLINE, OFFLINE, BOTH
+
+  // Location (OLX style)
+  latitude     Float?
+  longitude    Float?
+  locationName String? // e.g., "Sector 5, Noida"
+  city         String? // Broad filter
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
