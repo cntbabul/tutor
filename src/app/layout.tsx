@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OLX Clone - Buy and Sell for free",
-  description: "OLX India Clone built with Next.js, Tailwind, and Shadcn UI",
+  title: "tutor - connect with nearest tutor.",
+  description: "Find the Tutor near you ",
 };
 
 import { ClerkProvider } from "@clerk/nextjs";

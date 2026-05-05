@@ -41,8 +41,8 @@ export const userApi = {
 };
 
 export const listingApi = {
-    getListings: (api: AxiosInstance, q?: string) => 
-        api.get("/api/listings", { params: { q } }),
+    getListings: (api: AxiosInstance, params?: any) => 
+        api.get("/api/listings", { params }),
     getListing: (api: AxiosInstance, id: string) => 
         api.get(`/api/listings/${id}`),
     createListing: (api: AxiosInstance, userId: string, data: any) => 

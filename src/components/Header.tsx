@@ -1,19 +1,18 @@
 "use client";
 
-import { MapPin, ChevronDown, Plus, User, Bell, MessageCircle } from "lucide-react";
+import { MapPin, ChevronDown, Plus, Bell, MessageCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 import SearchBar from "./SearchBar";
 import UserDropdown from "./UserDropdown";
 import NotificationDropdown from "./NotificationDropdown";
 import LocationSelector from "./LocationSelector";
-import { UserButton, useAuth, useUser, SignInButton } from "@clerk/nextjs";
+
 import { useRouter } from "next/navigation";
 
 export default function Header() {
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+
   const router = useRouter();
 
   return (
@@ -76,18 +75,7 @@ export default function Header() {
             <NotificationDropdown />
           </div>
 
-          {isSignedIn ? (
-            <UserButton />
-          ) : (
-            <SignInButton mode="modal">
-              <Avatar className="h-9 w-9 border-2 border-primary/10 cursor-pointer hover:border-primary/30 transition-all">
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-primary/5 text-primary">
-                  <User size={20} />
-                </AvatarFallback>
-              </Avatar>
-            </SignInButton>
-          )}
+          <UserDropdown />
         </div>
       </div>
     </header>

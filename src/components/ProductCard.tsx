@@ -18,6 +18,7 @@ interface TutorListingProps {
     isFeatured?: boolean;
     isElite?: boolean;
     date?: string;
+    targetClasses?: string[];
     tutor: {
       name: string;
       qualification: string;
@@ -120,9 +121,16 @@ export default function ProductCard({ product }: TutorListingProps) {
               <div className="flex items-center gap-1.5 text-gray-500 text-[13px]">
                 <User size={14} className="text-gray-400" />
                 <span className="truncate">{product.tutor.name}</span>
-                <span className="text-gray-300">•</span>
-                <span className="truncate text-gray-400 font-medium">{product.tutor.qualification}</span>
               </div>
+              {product.targetClasses && product.targetClasses.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {product.targetClasses.map((cls) => (
+                    <span key={cls} className="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold">
+                      {cls}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Spacer */}

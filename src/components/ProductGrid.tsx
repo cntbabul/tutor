@@ -8,7 +8,9 @@ import { useSearchParams } from "next/navigation";
 export default function ProductGrid() {
   const searchParams = useSearchParams();
   const q = searchParams.get("q") || undefined;
-  const { data: products, isLoading, error } = useProducts(q);
+  const categorySlug = searchParams.get("category") || undefined;
+  
+  const { data: products, isLoading, error } = useProducts({ q, categorySlug });
 
   if (isLoading) {
     return (
@@ -41,7 +43,7 @@ export default function ProductGrid() {
         </div>
       </div>
 
-      {products?.length === 0 ? (
+      {(!products || !Array.isArray(products) || products.length === 0) ? (
         <div className="text-center py-24 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
           <p className="text-xl text-muted-foreground">No tutors found matching your search.</p>
           <Button variant="link" onClick={() => window.location.href = "/"} className="mt-4 text-primary font-bold">
@@ -50,7 +52,7 @@ export default function ProductGrid() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products?.map((product: any) => (
+          {products.map((product: any) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

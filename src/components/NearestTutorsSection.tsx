@@ -1,37 +1,22 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import { API_URL } from "@/lib/constants";
 import { useProducts } from "@/hooks/useProducts";
 
-interface TutorListing {
-  id: string;
-  title: string;
-  price: number;
-  location: string;
-  category: string;
-  subCategory: string;
-  images: string[];
-  isFeatured?: boolean;
-  isElite?: boolean;
-  date?: string;
-  tutor: {
-    name: string;
-    qualification: string;
-  };
-}
+import { Listing } from "@/types";
 
 export default function NearestTutorsSection() {
-  const { data, isLoading } = useProducts();
-
-  const tutors = useMemo<TutorListing[]>(() => {
-    if (!data) return [];
-    return data.map((tutor: any, index: number) => ({
-      ...tutor,
-      date: index === 0 ? "TODAY" : index === 1 ? "YESTERDAY" : `${index + 2} DAYS AGO`
-    }));
-  }, [data]);
+  const { data: tutors, isLoading } = useProducts(undefined, {
+    select: (data) => {
+      if (!data || !Array.isArray(data)) return [];
+      return data.map((tutor: any, index: number) => ({
+        ...tutor,
+        date: index === 0 ? "TODAY" : index === 1 ? "YESTERDAY" : `${index + 2} DAYS AGO`
+      }));
+    }
+  });
 
   if (isLoading) {
     return (
@@ -46,7 +31,7 @@ export default function NearestTutorsSection() {
     );
   }
 
-  if (tutors.length === 0) return null;
+  if (!tutors || tutors.length === 0) return null;
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -62,7 +47,7 @@ export default function NearestTutorsSection() {
 
       {/* Horizontal scrolling container */}
       <div className="flex gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x">
-        {tutors.map((tutor: TutorListing) => (
+        {tutors.map((tutor: Listing) => (
           <div key={tutor.id} className="w-[300px] shrink-0 snap-start">
             <ProductCard product={tutor} />
           </div>
